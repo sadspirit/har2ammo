@@ -1,7 +1,5 @@
-
-module.exports = function (program, config) {
+module.exports = function (program, defaultConfig, callback) {
     var _ = require('lodash'),
-        colors = require('colors'), // подсветка вывода данных
         url = require('url'),
         fs = require('fs'),
         path = require('path');
@@ -11,7 +9,6 @@ module.exports = function (program, config) {
     this.cookieNumber = null;
 
     this.init = function () {
-
         this.checkParams();
         this.getHAR();
         this.getConfig();
@@ -20,24 +17,19 @@ module.exports = function (program, config) {
         this.beforeProcess();
         this.process();
         this.afterProcess();
-    }
+    };
 
     this.checkParams = function () {
         var error;
-        if (!program.input) {
-            program.help();
-        }
 
         if (!this.ifExistsFile(program.input)) {
             error = 'File ' + program.input + ' not exist!';
-            console.error(error.red);
-            process.exit(1);
+            return callback(error);
         }
 
         if (program.config && !this.ifExistsFile(program.config)) {
             error = 'File ' + program.config + ' not exist!';
-            console.error(error.red);
-            process.exit(1);
+            return callback(error);
         }
     }
 
@@ -46,16 +38,14 @@ module.exports = function (program, config) {
             var har = this.parseJsonFile(program.input);
         } catch (e) {
             var error = "Can't parse HAR file - " + e.message;
-            console.error(error.red);
-            process.exit(2);
+            return callback(error);
         }
 
         if (har && har.log && har.log.entries && har.log.entries.length) {
             this.har = har.log.entries;
         } else {
             var error = 'Invalid HAR file.';
-            console.error(error.red);
-            process.exit(2);
+            return callback(error);
         }
     }
 
@@ -66,12 +56,12 @@ module.exports = function (program, config) {
 
     this.getConfig = function () {
         if (!program.config) {
-            this.config = config;
+            this.config = defaultConfig;
             return;
         }
 
         var conf = this.parseJsonFile(program.config);
-        this.config = _.extend(config, conf);
+        this.config = _.extend(defaultConfig, conf);
     }
 
     this.pathNormalise = function (filePath) {
@@ -234,9 +224,10 @@ module.exports = function (program, config) {
 
     this.returnData = function (data) {
         if (!program.output) {
-            console.log(data);
+            callback(null, data);
         } else {
             fs.appendFileSync(program.output, data);
+            callback();
         }
     }
 

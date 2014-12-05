@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 var program = require('commander'),
+    colors = require('colors'), // подсветка вывода данных
     config = {
         "autoTag": true,
         "host": null,
         "pathFilterRegexp": false,
         "clearCookies": false,
         "customCookies": false,
-        "customHeaders": [{
-            "name": "User-Agent",
-            "value": "yandex-tank yandex-tank/har2ammo"
-        }]
+        "customHeaders": [
+            {
+                "name": "User-Agent",
+                "value": "yandex-tank yandex-tank/har2ammo"
+            }
+        ]
     };
-
 
 
 var Har2Ammo = require('..');
@@ -35,4 +37,17 @@ program.on('--help', function () {
 
 program.parse(process.argv);
 
-var har2ammo = new Har2Ammo(program, config);
+if (!program.input) {
+    program.help();
+    process.exit(0);
+}
+
+var har2ammo = new Har2Ammo(program, config, handler);
+
+function handler(error, data) {
+    if (error) {
+        console.error(error.red);
+        process.exit(1);
+    }
+    console.log(data);
+};
