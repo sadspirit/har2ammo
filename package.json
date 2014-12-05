@@ -8,7 +8,7 @@
     "maintainers": [],
     "contributors": [],
     "bin": {
-        "har2ammo": "./index.js"
+        "har2ammo": "./bin/har2ammo.js"
     },
     "bugs": {
         "url": "https://github.com/banzalik/har2ammo/issues"

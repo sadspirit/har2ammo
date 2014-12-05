@@ -1,18 +1,5 @@
-#!/usr/bin/env node
-var program = require('commander'),
-    config = {
-        "autoTag": true,
-        "host": null,
-        "pathFilterRegexp": false,
-        "clearCookies": false,
-        "customCookies": false,
-        "customHeaders": [{
-            "name": "User-Agent",
-            "value": "yandex-tank yandex-tank/har2ammo"
-        }]
-    };
 
-var Har2Ammo = function (program, config) {
+module.exports = function (program, config) {
     var _ = require('lodash'),
         colors = require('colors'), // подсветка вывода данных
         url = require('url'),
@@ -72,9 +59,9 @@ var Har2Ammo = function (program, config) {
         }
     }
 
-    this.parseJsonFile = function(filename) {
+    this.parseJsonFile = function (filename) {
         var content = fs.readFileSync(this.pathNormalise(filename), 'utf8');
-            return JSON.parse(content);
+        return JSON.parse(content);
     }
 
     this.getConfig = function () {
@@ -135,7 +122,7 @@ var Har2Ammo = function (program, config) {
 
         if (_.isArray(this.config.customCookies)) {
             var i, length = this.config.customCookies.length;
-            for (i=0; i < length ; i++) {
+            for (i = 0; i < length; i++) {
                 this.cookieNumber = i;
                 this.processGo();
             }
@@ -144,7 +131,7 @@ var Har2Ammo = function (program, config) {
         }
     }
 
-    this.processGo = function() {
+    this.processGo = function () {
         var _self = this;
         _.forEach(this.har, function (elem) {
             if (elem.request) {
@@ -281,23 +268,3 @@ var Har2Ammo = function (program, config) {
 
     this.init();
 };
-
-program
-    .version('0.1.5')
-    .option('-i, --input <file>', 'path to HAR file')
-    .option('-o, --output <file> [required]', 'path to ammo.txt file')
-    .option('-h, --host <hostname>', 'base host, strong val')
-    .option('-c, --config <file> [required]', 'parh to config file')
-    .parse(process.argv);
-
-program.on('--help', function () {
-    console.log('  Examples:');
-    console.log('');
-    console.log('    har2ammo -i input.har -o ammo.txt');
-    console.log('    har2ammo -c config.json -i input.har -o ammo.txt');
-    console.log('');
-});
-
-program.parse(process.argv);
-
-var har2ammo = new Har2Ammo(program, config);

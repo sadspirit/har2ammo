@@ -1,7 +1,7 @@
 var exec = require("child_process").execFile,
     fs = require('fs'),
     assert = require("assert"),
-    har2ammoPath = "./index.js";
+    har2ammoPath = "./bin/har2ammo.js";
 
 function getFileContent(path) {
     return fs.readFileSync(path, 'utf8');
